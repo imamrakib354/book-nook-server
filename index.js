@@ -9,6 +9,22 @@ const port = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
+const client = new MongoClient(process.env.MONGODB_URI);
+
+export async function connectToMongoDB() {
+  try {
+    await client.connect();
+    console.log("You successfully connected to MongoDB!");
+    return client;
+  } catch (err) {
+    console.dir(err);
+  }
+}
+
+const mongoClient = await connectToMongoDB();
+const db = mongoClient.db("BookNookDB");
+const booksCollection = db.collection("BooksCollection");
+
 app.get('/', (req,res) => {
     res.send({message: 'Server is running fine!'})
 })

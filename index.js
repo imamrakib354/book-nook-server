@@ -40,6 +40,26 @@ app.get("/all-books", async (req, res) => {
   res.send(result);
 });
 
+app.get("/all-books/:id", async (req, res) => {
+  const { id } = req.params;
+  const result = await booksCollection.findOne({
+    _id: new ObjectId(id),
+  });
+  res.send(result);
+});
+
+
+app.get("/all-books/category/:category", async (req, res) => {
+  const { category } = req.params;
+
+  const result = await booksCollection
+    .find({ category: category })
+    .toArray();
+
+  res.send(result);
+});
+
+
 if (!process.env.VERCEL) {
   app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

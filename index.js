@@ -35,6 +35,11 @@ app.post("/add-book", async (req, res) => {
   res.send(result);
 });
 
+app.get("/all-books", async (req, res) => {
+  const result = await booksCollection.find().toArray();
+  res.send(result);
+});
+
 if (!process.env.VERCEL) {
   app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

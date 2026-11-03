@@ -60,6 +60,31 @@ app.get("/all-books/category/:category", async (req, res) => {
 });
 
 
+app.get("/my-books", async (req, res) => {
+  const { email } = req.query;
+
+  if (typeof email !== "string" || !email) {
+    return res.status(400).send({ message: "Email is required" });
+  }
+
+  const result = await booksCollection
+    .find({ ownerEmail: email })
+    .toArray();
+
+  res.send(result);
+});
+
+app.patch("/all-books/:id", async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  const result = await booksCollection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: data }
+  );
+  res.json(result);
+});
+
+
 if (!process.env.VERCEL) {
   app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

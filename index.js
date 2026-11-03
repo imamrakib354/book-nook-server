@@ -36,7 +36,10 @@ app.post("/add-book", async (req, res) => {
   data.copies = Number(data.copies);
   data.borrowDays = Number(data.borrowDays);
 
-  const result = await booksCollection.insertOne(data);
+  const result = await booksCollection.insertOne({
+    ...data,
+    borrowCount: 0
+  });
   res.send(result);
 });
 
@@ -120,7 +123,7 @@ app.post("/my-borrows", async (req, res) => {
 
   const updated = await booksCollection.updateOne(
     { _id: book._id, copies: { $gt: 0 } },
-    { $inc: { copies: -1 } }
+    { $inc: { copies: -1, borrowCount: 1 } }
   );
 
   if (updated.modifiedCount === 0) {
@@ -181,4 +184,6 @@ if (!process.env.VERCEL) {
     console.log(`Server is running at http://localhost:${port}`);
   });
 }
+
+export default app;
 

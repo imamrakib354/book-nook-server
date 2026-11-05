@@ -67,30 +67,11 @@ const db = mongoClient.db("BookNookDB");
 const booksCollection = db.collection("BooksCollection");
 const borrowedBooksCollection = db.collection("BorrowedBooks");
 
-// 1. GET /books - Public books, category, or my books
-app.get(
-  "/books",
-  (req, res, next) => {
-    if (req.query.mine === "true") {
-      return verifyToken(req, res, next);
-    }
-    next();
-  },
-  async (req, res) => {
-    const filter = {};
-
-    if (req.query.mine === "true") {
-      filter.ownerEmail = req.user.email;
-    }
-
-    if (req.query.category) {
-      filter.category = req.query.category;
-    }
-
-    const result = await booksCollection.find(filter).toArray();
-    res.send(result);
-  }
-);
+// 1. GET /books - Get all books
+app.get("/books", async (req, res) => {
+  const result = await booksCollection.find().toArray();
+  res.send(result);
+});
 
 // 2. GET /books/:id - Get single book
 app.get("/books/:id", verifyToken, async (req, res) => {
@@ -253,6 +234,17 @@ app.delete("/borrows/:id", verifyToken, async (req, res) => {
       { $inc: { copies: 1 } }
     );
   }
+
+  res.send(result);
+});
+
+// GET /new-arrivals - Get the latest 6 books
+app.get("/new-arrivals", async (req, res) => {
+  const result = await booksCollection
+    .find()
+    .sort({ createdAt: -1 })
+    .limit(6)
+    .toArray();
 
   res.send(result);
 });
